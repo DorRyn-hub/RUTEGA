@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3100__TRACKED_VAR__)",
+      "Bash(npx prisma *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -I http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"Code: %{http_code} URL: %{url_effective} Redir: %{redirect_url}\\\\n\" -I http://localhost:3000/)",
+      "Bash(ps -p 50717 -o command=)",
+      "Bash(curl -s -o /dev/null -w \"Code: %{http_code} Redir: %{redirect_url}\\\\n\" -L --max-redirs 0 http://localhost:3000/)",
+      "Bash(xargs kill -9)",
+      "Bash(PORT=3000 npm run dev)",
+      "Bash(echo \"started pid=$!\")"
+    ]
+  }
+}

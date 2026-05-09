@@ -1,0 +1,30 @@
+import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
+import { requireAdminApi } from "@/lib/admin/guard";
+import { adminListNews, adminCreateNews } from "@/lib/admin/repos";
+import { newsCreateSchema } from "@/lib/validation/admin";
+import { badRequest, fromZod, serverError } from "@/lib/api/respond";
+
+export async function GET() {
+  const auth = await requireAdminApi();
+  if (!auth.ok) return auth.response;
+  const news = await adminListNews();
+  return NextResponse.json({ news });
+}
+
+export async function POST(req: NextRequest) {
+  const auth = await requireAdminApi();
+  if (!auth.ok) return auth.response;
+  try {
+    const input = newsCreateSchema.parse(await req.json());
+    const item = await adminCreateNews(input);
+    return NextResponse.json({ item }, { status: 201 });
+  } catch (err) {
+    if (err instanceof ZodError) return fromZod(err);
+    if (err instanceof Error && err.message.includes("Unique")) {
+      return badRequest("Slug уже используется", { slug: "Slug уже занят" });
+    }
+    console.error("admin create news", err);
+    return serverError();
+  }
+}

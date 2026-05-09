@@ -1,0 +1,24 @@
+Все 14 задач закрыты. Lint warning (<img> в TwoFactorPanel.tsx) — pre-existing, не относится к этой итерации.
+
+  Что сделано
+
+  Phase 1 (Маркетинг-MVP по брифу), готовый к деплою на Beget Shared Node.js:
+
+  - Модели и данные: добавлены Case и CoveragePoint в Prisma (миграция применена), seed для 3 кейсов и 13 точек покрытия. Lead расширен полями inn, companyName, consentMarketing, crmExternalId/syncedAt.
+  - Новые страницы: /cases, /cases/[slug], /coverage, /technologies, /services/b2g, /about/team, /about/licenses, /about/requisites, /thanks.
+  - Новые компоненты: CostCalculator (+ pure-логика calculator.ts + 10 unit-тестов), CoverageMap (Yandex Maps 2.1 dynamic-loaded), CallbackModal (нативный <dialog>), SmartCaptcha, A11yToggle, CaseCard, UI-примитивы
+  Dialog/Checkbox/Select.
+  - Формы: 152-ФЗ согласие + маркетинговое согласие + SmartCaptcha на всех публичных формах. У LeadForm появился variant="two-step" (имя+телефон → ИНН+компания). Редирект на /thanks после успешной отправки.
+  - Интеграции: /api/leads, /api/contact, /api/callback — единый pipeline через deliverLead(): rate-limit → Zod → honeypot → SmartCaptcha verify → запись в БД → параллельный пуш в Bitrix24 (webhook) и Unisender (admin alert)
+  через Promise.allSettled.
+  - API: добавлены /api/coverage (FeatureCollection), /api/cases, /api/cases/[slug].
+  - SEO: LocalBusiness JSON-LD в root layout, FaqPageJsonLd, Article для кейсов. Sitemap обновлён (включает кейсы, услуги, B2G, coverage, technologies, about-*). Robots disallow для /thanks, /admin, /demo-access.
+  - Безопасность: HSTS (prod-only), CSP расширен под Yandex Maps + SmartCaptcha.
+  - Шапка/подвал: новая навигация с пунктами «Карта покрытия», «Кейсы», «Технологии», «О компании», «Блог». Кнопка «Заказать звонок» (модалка) и тумблер «Версия для слабовидящих» (B2G-требование) с localStorage-памятью и
+  стилями .a11y в globals.css.
+  - Beget: server.js (Passenger entry), .htaccess, scripts/build-for-beget.sh (собирает в ./deploy/), пошаговая инструкция в BEGET_DEPLOY.md. .env.example пополнен ключами (Bitrix24, Unisender, SmartCaptcha, Yandex Maps).
+  - CLAUDE.md: исправлены демо-кредиты, документированы новые модули, описан Beget-pipeline, добавлено замечание о share* скриптах и о том, что route handlers могут вызывать prisma напрямую (write-paths).
+
+  Верификация: npm run typecheck ✓, npm test 57/57 ✓, npm run build ✓ (все маршруты сгенерированы, включая 3 кейса как SSG).
+
+  Что осталось у вас: залить ключи Bitrix24/Unisender/SmartCaptcha/Yandex Maps в .env, выполнить bash scripts/build-for-beget.sh и следовать BEGET_DEPLOY.md.

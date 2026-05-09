@@ -1,0 +1,533 @@
+// Prisma schema for Rutega B2B Customer Portal.
+// Switch to PostgreSQL by changing provider to "postgresql" and updating DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+//  USERS / ORGANIZATIONS / RBAC
+// ============================================================================
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  username       String?       @unique
+  phone          String?
+  fullName       String
+  passwordHash   String
+  role           String        @default("user")
+  status         String        @default("active") // active | banned
+  lastLoginAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  bills          Bill[]
+  services       UserService[]
+  leadsAssigned  Lead[]        @relation("LeadAssignee")
+  memberships    OrganizationMember[]
+  managedOrgs    Organization[] @relation("OrgManager")
+  twoFactor      TwoFactor?
+  ticketMessages TicketMessage[]
+  ticketsOpened  Ticket[]      @relation("TicketAuthor")
+  ticketsAssigned Ticket[]     @relation("TicketAssignee")
+  auditEntries   AuditLog[]
+  npsResponses   NpsResponse[]
+}
+
+model Organization {
+  id            String   @id @default(cuid())
+  inn           String   @unique
+  kpp           String?
+  ogrn          String?
+  legalName     String
+  shortName     String?
+  legalAddress  String
+  postalAddress String?
+  bankDetails   String?  // JSON: account, BIK, bankName, corrAccount
+  contactEmail  String?
+  contactPhone  String?
+  status        String   @default("active") // active | suspended | archived
+  accountManager   User?  @relation("OrgManager", fields: [accountManagerId], references: [id], onDelete: SetNull)
+  accountManagerId String?
+  twoFactorRequired Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  members       OrganizationMember[]
+  account       Account?
+  sites         Site[]
+  tickets       Ticket[]
+  connectionRequests ConnectionRequest[]
+  apiKeys       ApiKey[]
+  npsResponses  NpsResponse[]
+  compensations Compensation[]
+
+  @@index([accountManagerId])
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  role           String   // director | accountant | tech | viewer
+  position       String?
+  invitedAt      DateTime @default(now())
+  acceptedAt     DateTime?
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model Site {
+  id             String   @id @default(cuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  title          String
+  address        String
+  lat            Float?
+  lng            Float?
+  status         String   @default("active") // active | suspended | inactive
+  createdAt      DateTime @default(now())
+
+  userServices   UserService[]
+
+  @@index([organizationId])
+}
+
+// ============================================================================
+//  CATALOG: SERVICES / TARIFFS / NEWS
+// ============================================================================
+
+model Service {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  category    String
+  shortText   String
+  description String
+  iconKey     String
+  features    String        // JSON array as string
+  slaUptime   Float         @default(99.5)   // публичный SLA, %
+  slaResponseHours Int      @default(4)      // SLA на первичный ответ
+  slaResolveHours Int       @default(24)     // SLA на решение
+  order       Int           @default(0)
+  tariffs     Tariff[]
+  userLinks   UserService[]
+  incidents   ServiceIncident[]
+}
+
+model Tariff {
+  id         String        @id @default(cuid())
+  slug       String        @unique
+  service    Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  serviceId  String
+  title      String
+  speedMbps  Int?
+  priceRub   Int
+  perks      String        // JSON array as string
+  highlight  Boolean       @default(false)
+  order      Int           @default(0)
+
+  @@index([serviceId])
+}
+
+model NewsItem {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  body        String
+  publishedAt DateTime
+  cover       String?
+}
+
+// ============================================================================
+//  USER SERVICES (B2C legacy + B2B at site level)
+// ============================================================================
+
+model UserService {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  serviceId  String
+  site       Site?    @relation(fields: [siteId], references: [id], onDelete: SetNull)
+  siteId     String?
+  tariffSlug String
+  status     String   @default("active") // active | paused | pending
+  startedAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([siteId])
+}
+
+// ============================================================================
+//  BILLING ENGINE
+// ============================================================================
+
+model Account {
+  id              String   @id @default(cuid())
+  number          String   @unique  // ЛС-XXXXX
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String   @unique
+  balanceKop      Int      @default(0)        // баланс в копейках, может быть отрицательным
+  creditLimitKop  Int      @default(0)        // допустимая отрицательная сумма
+  billingMode     String   @default("postpay") // postpay | prepay
+  currency        String   @default("RUB")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  charges  Charge[]
+  payments Payment[]
+  invoices Invoice[]
+}
+
+model Charge {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
+  period    String   // YYYY-MM
+  amountKop Int      // в копейках, всегда положительная для начислений
+  source    String   // subscription | oneoff | sla_compensation_reversal
+  description String
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  invoiceId String?
+  createdAt DateTime @default(now())
+
+  @@index([accountId, period])
+  @@index([invoiceId])
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
+  amountKop Int
+  method    String   // bank_transfer | card | manual
+  externalRef String?
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([accountId])
+}
+
+model Invoice {
+  id         String   @id @default(cuid())
+  number     String   @unique // СЧ-2026-000001
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId  String
+  period     String   // YYYY-MM
+  totalKop   Int
+  vatKop     Int      @default(0)
+  status     String   @default("issued") // issued | paid | overdue | cancelled
+  issuedAt   DateTime @default(now())
+  dueAt      DateTime
+  paidAt     DateTime?
+  htmlSnapshot String?  // отрендеренная HTML-копия для архива
+  edoExternalId String?  // когда подключим Диадок — сюда упадёт ID документа
+
+  charges    Charge[]
+
+  @@index([accountId])
+  @@index([status])
+}
+
+// ============================================================================
+//  SLA / INCIDENTS / STATUS PAGE
+// ============================================================================
+
+model StatusComponent {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  description   String?
+  group         String?
+  currentStatus String   @default("operational") // operational | degraded | partial_outage | major_outage | maintenance
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ServiceIncident {
+  id            String   @id @default(cuid())
+  service       Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  serviceId     String?
+  title         String
+  summary       String
+  severity      String   @default("minor") // minor | major | critical | maintenance
+  componentSlugs String  @default("[]")  // JSON-массив slug-ов StatusComponent
+  affectedOrgIds String  @default("[]")  // JSON-массив id организаций (пустой = все клиенты)
+  startedAt     DateTime
+  resolvedAt    DateTime?
+  publicRfo     String?  // post-mortem (Reason For Outage)
+  isPublic      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  updates       IncidentUpdate[]
+  compensations Compensation[]
+
+  @@index([severity])
+  @@index([resolvedAt])
+}
+
+model IncidentUpdate {
+  id          String   @id @default(cuid())
+  incident    ServiceIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  incidentId  String
+  status      String   // investigating | identified | monitoring | resolved | scheduled
+  message     String
+  createdAt   DateTime @default(now())
+
+  @@index([incidentId])
+}
+
+model Compensation {
+  id             String   @id @default(cuid())
+  incident       ServiceIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  incidentId     String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  period         String   // YYYY-MM, в каком периоде начислить
+  amountKop      Int
+  reason         String
+  applied        Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  @@unique([incidentId, organizationId])
+  @@index([organizationId])
+}
+
+// ============================================================================
+//  TICKETS
+// ============================================================================
+
+model Ticket {
+  id              String   @id @default(cuid())
+  number          Int      @unique
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId  String?
+  openedBy        User     @relation("TicketAuthor", fields: [openedById], references: [id], onDelete: Cascade)
+  openedById      String
+  assignedTo      User?    @relation("TicketAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedToId    String?
+  subject         String
+  category        String   @default("general") // general | technical | billing | sales | sla
+  priority        String   @default("normal")  // low | normal | high | urgent
+  status          String   @default("open")    // open | in_progress | waiting_customer | resolved | closed
+  slaRespondAt    DateTime
+  slaResolveAt    DateTime
+  firstResponseAt DateTime?
+  resolvedAt      DateTime?
+  closedAt        DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  messages        TicketMessage[]
+
+  @@index([organizationId, status])
+  @@index([assignedToId])
+  @@index([status])
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  body      String
+  isInternal Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+}
+
+// ============================================================================
+//  CONNECTION REQUESTS
+// ============================================================================
+
+model ConnectionRequest {
+  id             String   @id @default(cuid())
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId String?
+  contactName    String
+  contactPhone   String
+  contactEmail   String?
+  inn            String?
+  legalName      String?
+  address        String
+  lat            Float?
+  lng            Float?
+  serviceType    String   // internet | l2vpn | mpls | hosting | colocation | other
+  speedMbps      Int?
+  desiredDate    DateTime?
+  notes          String?
+  status         String   @default("new") // new | survey | quoted | accepted | rejected | active
+  surveyAvailability String? // available | partial | unavailable
+  surveyNotes    String?
+  quote          String?  // JSON: items[], oneOffKop, monthlyKop, sentAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([organizationId])
+}
+
+// ============================================================================
+//  LEGACY LEAD (callback / contact form)
+// ============================================================================
+
+model Bill {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  amount    Int
+  status    String    // paid | due | overdue
+  period    String    // YYYY-MM
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Lead {
+  id              String   @id @default(cuid())
+  name            String
+  phone           String
+  email           String?
+  message         String?
+  source          String   // callback | tariff | contact | calculator
+  tariffSlug      String?
+  inn             String?
+  companyName     String?
+  consentPdn      Boolean  @default(true)
+  consentMarketing Boolean @default(false)
+  crmExternalId   String?
+  crmSyncedAt     DateTime?
+  status          String   @default("new") // new | in_progress | closed | rejected
+  note            String?
+  assignedTo      User?    @relation("LeadAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedToId    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+
+  @@index([status])
+  @@index([assignedToId])
+}
+
+// ============================================================================
+//  CASES (B2B/B2G success stories) and COVERAGE MAP
+// ============================================================================
+
+model Case {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  clientName    String
+  clientLogoUrl String?
+  industry      String   // ритейл, девелопмент, финансы, госсектор, ЖКХ, образование...
+  segment       String   @default("b2b") // b2b | b2g
+  summary       String   // короткий тизер для карточек
+  challenge     String   // задача
+  solution      String   // решение
+  result        String   // результат
+  techStack     String   @default("[]") // JSON-массив (как Service.features)
+  metrics       String   @default("[]") // JSON-массив { label, value }
+  publishedAt   DateTime
+  isPublished   Boolean  @default(true)
+  order         Int      @default(0)
+  cover         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isPublished, publishedAt])
+}
+
+model CoveragePoint {
+  id        String   @id @default(cuid())
+  type      String   // optic | radio | pop
+  title     String?
+  // Простая широта/долгота (для точек) — для линий/полигонов используем geojson.
+  lat       Float?
+  lng       Float?
+  geojson   String?  // GeoJSON Feature (для полилиний и полигонов)
+  metadata  String?  // JSON: city, district, capacity и т.п.
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([type])
+}
+
+// ============================================================================
+//  AUDIT LOG / 2FA / API KEYS / NPS
+// ============================================================================
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  actor          User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorId        String?
+  organizationId String?
+  action         String   // domain.entity.verb (например, billing.invoice.create)
+  targetType     String?
+  targetId       String?
+  ip             String?
+  userAgent      String?
+  payload        String?  // JSON snapshot изменений
+  createdAt      DateTime @default(now())
+
+  @@index([actorId])
+  @@index([organizationId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model TwoFactor {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String   @unique
+  secret        String                              // base32-секрет TOTP (зашифровать в проде; здесь хранится как есть для демо)
+  recoveryCodes String                              // JSON-массив одноразовых кодов (хеш bcrypt)
+  enabledAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ApiKey {
+  id             String   @id @default(cuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  name           String
+  prefix         String   // первые 8 символов ключа для отображения
+  hash           String   // sha256(plain)
+  scopes         String   @default("[]") // JSON-массив скоупов: read, write, billing, tickets
+  lastUsedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([prefix])
+}
+
+model NpsResponse {
+  id             String   @id @default(cuid())
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId         String?
+  score          Int      // 0..10
+  comment        String?
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([createdAt])
+}

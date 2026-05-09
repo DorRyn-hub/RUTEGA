@@ -1,0 +1,22 @@
+services:
+  web:
+    build: .
+    image: rutega-website:latest
+    container_name: rutega-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "file:/app/data/prod.db"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required, set it in .env}"
+      NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}"
+      NEXT_PUBLIC_YANDEX_METRIKA_ID: "${NEXT_PUBLIC_YANDEX_METRIKA_ID:-}"
+      NEXT_PUBLIC_YANDEX_MAP_EMBED: "${NEXT_PUBLIC_YANDEX_MAP_EMBED:-}"
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/services"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

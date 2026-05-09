@@ -1,0 +1,30 @@
+# Beget использует Phusion Passenger для запуска Node.js-приложений.
+# Эти директивы говорят Passenger как стартовать наше приложение.
+#
+# Если на вашей панели Beget указано иначе — сверьтесь с инструкцией:
+# https://beget.com/ru/kb/manual/sites/nodejs
+
+PassengerEnabled on
+PassengerAppType node
+PassengerAppRoot /home/USERNAME/PROJECT_DIR
+PassengerStartupFile server.js
+
+# Версия Node.js. Beget предоставляет несколько версий — указать ту, что
+# выбрана в панели управления для приложения.
+# PassengerNodejs /usr/bin/node20
+
+# Передаём оригинальный Host для корректной работы Next.js за прокси.
+PassengerSetEnv NODE_ENV production
+
+# Запретить листинг каталогов на всякий случай.
+Options -Indexes
+
+# Кеширование статики (favicon, og-image, etc).
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/avif "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>

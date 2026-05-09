@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B5FFF"/>
+      <stop offset="100%" stop-color="#0747B5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <g transform="translate(80,80)" fill="white">
+    <text x="0" y="120" font-family="Inter, sans-serif" font-size="64" font-weight="700">Rutega</text>
+    <text x="0" y="240" font-family="Inter, sans-serif" font-size="48" font-weight="700">Гигабит. ТВ в 4K. Мобильная связь.</text>
+    <text x="0" y="320" font-family="Inter, sans-serif" font-size="32" opacity="0.9">Подключение за 1–3 дня · Поддержка 24/7 · SLA 99.95%</text>
+  </g>
+</svg>

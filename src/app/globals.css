@@ -1,0 +1,339 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #eaf2ff;
+  --color-brand-100: #d4e4ff;
+  --color-brand-200: #a9c8ff;
+  --color-brand-300: #7eadff;
+  --color-brand-400: #4f8fff;
+  --color-brand-500: #2670ff;
+  --color-brand-600: #0b5fff;
+  --color-brand-700: #0747b5;
+  --color-brand-800: #053285;
+  --color-brand-900: #04205a;
+
+  --color-ink: #0a0f1f;
+  --color-muted: #5b6273;
+  --color-surface: #ffffff;
+  --color-bg: #f7f8fb;
+  --color-line: #e5e8ef;
+
+  --color-success: #16a34a;
+  --color-warn: #d97706;
+  --color-danger: #dc2626;
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-brand-200);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -3rem;
+    z-index: 100;
+    background: var(--color-brand-600);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  .prose-rutega {
+    color: var(--color-ink);
+    line-height: 1.7;
+  }
+  .prose-rutega h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .prose-rutega h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .prose-rutega p {
+    margin-bottom: 1rem;
+  }
+  .prose-rutega ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .prose-rutega ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .prose-rutega a {
+    color: var(--color-brand-700);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .scroll-shadow-x {
+    background:
+      linear-gradient(to right, white, transparent 6%, transparent 94%, white) 0 0 / 100% 100%
+        no-repeat;
+  }
+
+  /* Адаптивные admin-таблицы.
+     На экране < 640px <table> внутри .admin-table превращается в стопку карточек:
+     thead скрывается, каждая <td> рендерится отдельной строкой; первая ячейка
+     служит заголовком карточки, остальные получают подпись из data-label. */
+  @media (max-width: 639px) {
+    .admin-table table,
+    .admin-table thead,
+    .admin-table tbody,
+    .admin-table tr,
+    .admin-table th,
+    .admin-table td {
+      display: block;
+      width: 100%;
+    }
+    .admin-table thead {
+      display: none;
+    }
+    .admin-table tr {
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .admin-table tr:last-child {
+      border-bottom: 0;
+    }
+    .admin-table td {
+      padding: 0.25rem 0;
+      border: 0;
+      white-space: normal !important;
+      min-width: 0;
+    }
+    .admin-table td:first-child {
+      padding-top: 0;
+      font-weight: 600;
+      color: var(--color-ink);
+      font-size: 0.95rem;
+    }
+    .admin-table td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 2px;
+    }
+    .admin-table td[data-mobile-hidden="true"] {
+      display: none;
+    }
+    /* Заглушка "Нет данных" с colspan */
+    .admin-table td[colspan] {
+      text-align: center !important;
+      padding: 1.5rem 0 !important;
+      color: var(--color-muted);
+      font-weight: normal !important;
+    }
+  }
+}
+
+/* iOS Safari зумит, если у input font-size < 16px. Поднимаем до 16 в admin. */
+@media (max-width: 639px) {
+  .admin-form input,
+  .admin-form select,
+  .admin-form textarea,
+  .admin-table input,
+  .admin-table select {
+    font-size: 16px;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--fade-y, 8px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation-name: fade-in-up;
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes blob-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(40px, -30px, 0) scale(1.05);
+  }
+  66% {
+    transform: translate3d(-20px, 20px, 0) scale(0.97);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-blob-drift {
+  animation-name: blob-drift;
+  animation-duration: var(--blob-duration, 14s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 12s ease infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes slow-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.animate-slow-pulse {
+  animation: slow-pulse 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-gradient-shift,
+  .animate-shimmer,
+  .animate-slow-pulse,
+  .animate-fade-in-up,
+  .animate-blob-drift {
+    animation: none;
+  }
+}
+
+/* ===========================================================================
+   Версия для слабовидящих. Активируется добавлением класса .a11y на <html>
+   из A11yToggle. Соответствует требованиям типичных B2G-приёмок: увеличенный
+   шрифт, повышенный контраст, отключение декоративных анимаций.
+   =========================================================================== */
+html.a11y {
+  font-size: 125%;
+}
+html.a11y body {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+html.a11y a,
+html.a11y .text-\[var\(--color-brand-700\)\],
+html.a11y .text-\[var\(--color-brand-600\)\],
+html.a11y .text-\[var\(--color-brand-800\)\] {
+  color: #003366 !important;
+  text-decoration: underline !important;
+}
+html.a11y :focus-visible {
+  outline: 3px solid #003366 !important;
+  outline-offset: 3px !important;
+}
+html.a11y .text-\[var\(--color-muted\)\] {
+  color: #1a1a1a !important;
+}
+html.a11y img,
+html.a11y svg {
+  filter: contrast(1.15);
+}
+html.a11y * {
+  animation: none !important;
+  transition: none !important;
+}

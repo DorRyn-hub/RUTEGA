@@ -1,0 +1,38 @@
+ - Бесплатный Cloudflare Quick Tunnel (*.trycloudflare.com), HTTPS из коробки.
+  - Демо-доступ к ЛК: demo@rutega.ru / Demo12345! (подсказка на странице входа).
+  - Туннель и прод-сервер запущены в фоне:
+    - сервер npm run start PID 80109 (логи: /tmp/rutega-prod.log)
+    - cloudflared PID 80195 (логи: /tmp/rutega-tunnel.log)
+
+  Чтобы остановить, когда закончите показывать:
+
+  kill $(cat /tmp/rutega-tunnel.pid) $(cat /tmp/rutega-prod.pid)
+
+  Нюансы:
+  - URL временный — живёт пока работает процесс cloudflared и не уходит компьютер в сон. После перезапуска вы получите новый адрес.
+  - Если нужен постоянный поддомен (rutega.ваш-домен.dev) — это уже named tunnel, требует Cloudflare-аккаунта; могу настроить, если есть домен на CF.
+  - Заявки/регистрации с публичного URL пишутся в prisma/dev.db — реальные люди могут оставить тестовые данные. После показа можно прогнать rm prisma/dev.db && npx prisma
+  migrate deploy && npm run prisma:seed, чтобы сбросить.
+
+P.S. 
+ Скрипт scripts/share.sh (обёртка npm run share) поднимает сервер + туннель и выдаёт свежий URL при каждом запуске.
+                                                                                          
+  Как использовать:
+                                                                                                                                                                            
+  npm run share              # обычный запуск (новый URL)
+  npm run share -- --build   # с пересборкой проекта                                                                                                                        
+  npm run share -- --port 3001                              
+                                                                                                                                                                            
+  Что он делает:                                            
+  - Прибивает прошлый запуск (PIDы лежат в .share/), освобождает порт.                                                                                                      
+  - Создаёт .env с временным JWT_SECRET, если его нет.                                                                                                                      
+  - Собирает прод-билд, если нет .next/ (или передан --build).
+  - Поднимает npm run start и cloudflared tunnel.                                                                                                                           
+  - Печатает свежий https://*.trycloudflare.com-URL и сохраняет в .share/url.txt.                                                                                           
+  - По Ctrl-C корректно гасит и сервер, и туннель.                                                                                                                          
+                                                                                                                                                                            
+  Сейчас запущен старый туннель (https://twice-mlb-particle-ict.trycloudflare.com). Когда понадобится — Ctrl-C его не достанет, потому что он в фоне; убейте напрямую:      
+                                                                                                                                                                            
+  kill $(cat /tmp/rutega-tunnel.pid) $(cat /tmp/rutega-prod.pid)                                                                                                            
+                                                                                                                                                                            
+  После этого npm run share поднимет всё заново и даст свежий адрес. 
