@@ -26,5 +26,5 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", ".venv", "tests/e2e", "playwright-report"]
+  "exclude": ["node_modules", ".venv", "tests/e2e", "playwright-report", "deploy"]
 }

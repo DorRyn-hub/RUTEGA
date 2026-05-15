@@ -40,7 +40,7 @@ export function MobileMenu({ items, authenticated }: MobileMenuProps) {
   const panel =
     open && mounted
       ? createPortal(
-          <div className="lg:hidden">
+          <div className="xl:hidden">
             <button
               type="button"
               aria-label="Закрыть меню"
@@ -97,7 +97,7 @@ export function MobileMenu({ items, authenticated }: MobileMenuProps) {
         aria-label={open ? "Закрыть меню" : "Открыть меню"}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] hover:bg-[var(--color-bg)] lg:hidden"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] hover:bg-[var(--color-bg)] xl:hidden"
       >
         {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
       </button>

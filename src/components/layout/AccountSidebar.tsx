@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   KeyRound,
   Activity,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useState } from "react";
@@ -76,6 +77,7 @@ export function AccountSidebar({
 }: AccountSidebarProps) {
   const pathname = usePathname() ?? "";
   const [pending, setPending] = useState<string | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -97,75 +99,93 @@ export function AccountSidebar({
 
   return (
     <aside className="rounded-[var(--radius-lg)] border bg-white p-4 lg:sticky lg:top-20 lg:self-start">
-      <div className="mb-4 border-b pb-4">
+      <button
+        type="button"
+        onClick={() => setNavOpen((v) => !v)}
+        className="flex w-full items-center justify-between lg:hidden"
+        aria-expanded={navOpen}
+      >
+        <div className="text-left">
+          <p className="text-sm font-semibold">{fullName}</p>
+          <p className="break-all text-xs text-[var(--color-muted)]">{email}</p>
+        </div>
+        <ChevronDown
+          aria-hidden="true"
+          className={cn("h-4 w-4 text-[var(--color-muted)] transition-transform", navOpen && "rotate-180")}
+        />
+      </button>
+      <div className="hidden mb-4 border-b pb-4 lg:block">
         <p className="text-sm font-semibold">{fullName}</p>
         <p className="break-all text-xs text-[var(--color-muted)]">{email}</p>
       </div>
 
-      {organizations.length > 0 && (
-        <div className="mb-4 border-b pb-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
-            Активная организация
-          </p>
-          <select
-            value={activeOrgId ?? ""}
-            onChange={(e) => switchOrg(e.target.value)}
-            disabled={pending !== null}
-            className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--color-line)] bg-white px-2 py-1.5 text-sm"
-          >
-            {organizations.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-          {activeRoleLabel && (
-            <p className="mt-1 text-xs text-[var(--color-muted)]">Роль: {activeRoleLabel}</p>
-          )}
-        </div>
-      )}
-
-      <nav aria-label="Меню личного кабинета" className="space-y-4">
-        {sections.map((section, idx) => (
-          <div key={idx}>
-            {section.title && (
-              <p className="mb-1 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
-                {section.title}
-              </p>
+      <div className={cn("mt-4 lg:mt-0", !navOpen && "hidden lg:block")}>
+        {organizations.length > 0 && (
+          <div className="mb-4 border-b pb-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
+              Активная организация
+            </p>
+            <select
+              value={activeOrgId ?? ""}
+              onChange={(e) => switchOrg(e.target.value)}
+              disabled={pending !== null}
+              className="mt-2 w-full rounded-[var(--radius-md)] border border-[var(--color-line)] bg-white px-2 py-1.5 text-sm"
+            >
+              {organizations.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </select>
+            {activeRoleLabel && (
+              <p className="mt-1 text-xs text-[var(--color-muted)]">Роль: {activeRoleLabel}</p>
             )}
-            <ul className="flex flex-col gap-1">
-              {section.items.map(({ href, label, icon: Icon }) => {
-                const active = pathname === href || (href !== "/lk" && pathname.startsWith(href));
-                return (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(
-                        "flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors",
-                        active
-                          ? "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]"
-                          : "text-[var(--color-ink)] hover:bg-[var(--color-bg)]",
-                      )}
-                    >
-                      <Icon aria-hidden="true" className="h-4 w-4" />
-                      {label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
           </div>
-        ))}
-      </nav>
-      <button
-        type="button"
-        onClick={logout}
-        className="mt-4 flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-[var(--color-muted)] hover:bg-[var(--color-bg)] hover:text-[var(--color-danger)]"
-      >
-        <LogOut aria-hidden="true" className="h-4 w-4" />
-        Выйти
-      </button>
+        )}
+
+        <nav aria-label="Меню личного кабинета" className="space-y-4">
+          {sections.map((section, idx) => (
+            <div key={idx}>
+              {section.title && (
+                <p className="mb-1 text-xs font-medium uppercase tracking-wider text-[var(--color-muted)]">
+                  {section.title}
+                </p>
+              )}
+              <ul className="flex flex-col gap-1">
+                {section.items.map(({ href, label, icon: Icon }) => {
+                  const active = pathname === href || (href !== "/lk" && pathname.startsWith(href));
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        onClick={() => setNavOpen(false)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors",
+                          active
+                            ? "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]"
+                            : "text-[var(--color-ink)] hover:bg-[var(--color-bg)]",
+                        )}
+                      >
+                        <Icon aria-hidden="true" className="h-4 w-4" />
+                        {label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+        <button
+          type="button"
+          onClick={logout}
+          className="mt-4 flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-[var(--color-muted)] hover:bg-[var(--color-bg)] hover:text-[var(--color-danger)]"
+        >
+          <LogOut aria-hidden="true" className="h-4 w-4" />
+          Выйти
+        </button>
+      </div>
     </aside>
   );
 }
