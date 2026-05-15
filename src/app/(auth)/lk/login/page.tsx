@@ -24,10 +24,6 @@ export default async function LoginPage({
           Зарегистрироваться
         </Link>
       </p>
-      <div className="mt-6 rounded-[var(--radius-md)] border bg-[var(--color-brand-50)] px-4 py-3 text-sm text-[var(--color-brand-800)]">
-        Демо-доступ: <code className="font-mono">demo@rutega.ru</code> /{" "}
-        <code className="font-mono">Demo12345!</code>
-      </div>
       <LoginForm from={from} />
     </div>
   );

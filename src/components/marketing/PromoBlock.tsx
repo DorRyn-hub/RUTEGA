@@ -22,19 +22,19 @@ export function PromoBlock() {
             <div className="relative grid items-center gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <p className="text-sm font-semibold uppercase tracking-widest opacity-80">
-                  Конвергентный пакет
+                  Комплексное решение
                 </p>
                 <h2 className="mt-2 text-3xl font-bold sm:text-4xl">
-                  Интернет + ТВ + мобильная связь — со скидкой 35%
+                  Интернет + VPN + безопасность — под единым SLA
                 </h2>
                 <p className="mt-3 max-w-2xl opacity-90">
-                  Объедините услуги в один договор и счёт. Один менеджер, одна поддержка, одна
-                  выгода — каждый месяц.
+                  Подключите несколько корпоративных сервисов в один договор — единый счёт, один
+                  менеджер и сквозная ответственность по SLA.
                 </p>
               </div>
               <div className="flex justify-start lg:col-span-4 lg:justify-end">
-                <LinkButton href="/tariffs" variant="secondary" size="lg" className="bg-white">
-                  Собрать пакет
+                <LinkButton href="/contacts#order" variant="secondary" size="lg" className="bg-white">
+                  Получить КП
                 </LinkButton>
               </div>
             </div>

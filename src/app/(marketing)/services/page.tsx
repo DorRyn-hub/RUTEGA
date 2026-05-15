@@ -6,9 +6,9 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getAllServices } from "@/lib/repos";
 
 export const metadata: Metadata = {
-  title: "Услуги — каталог сервисов Rutega",
+  title: "Услуги — корпоративные сетевые решения Rutega",
   description:
-    "Каталог услуг Rutega: домашний интернет, цифровое ТВ, мобильная связь, решения для бизнеса, видеонаблюдение и умный дом.",
+    "Корпоративный интернет, IP-транзит, L2/L3 VPN, выделенные линии, Wi-Fi и сетевая безопасность. Исключительно для юридических лиц.",
   alternates: { canonical: "/services" },
 };
 
@@ -23,8 +23,8 @@ export default async function ServicesPage() {
         <div className="mt-4 max-w-2xl">
           <h1 className="text-4xl font-bold sm:text-5xl">Услуги Rutega</h1>
           <p className="mt-3 text-[var(--color-muted)]">
-            Полный каталог сервисов: для дома, бизнеса и комфорта. Подключайте отдельно или
-            объединяйте в один договор со скидкой.
+            Корпоративные сетевые решения для юридических лиц: выделенные каналы, IP-транзит,
+            VPN и безопасность — под единым SLA и в одном договоре.
           </p>
         </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

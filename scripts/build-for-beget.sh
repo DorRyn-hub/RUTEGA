@@ -11,8 +11,12 @@ cd "$ROOT_DIR"
 DEPLOY_DIR="$ROOT_DIR/deploy"
 echo "→ Сборка для Beget. Корень: $ROOT_DIR"
 
-echo "→ Очистка предыдущей сборки"
-rm -rf "$DEPLOY_DIR"
+echo "→ Очистка предыдущей сборки (только артефакт, Python-тулинг сохраняется)"
+rm -rf "$DEPLOY_DIR/.next" "$DEPLOY_DIR/public" "$DEPLOY_DIR/prisma" \
+       "$DEPLOY_DIR/node_modules" "$DEPLOY_DIR/data"
+rm -f  "$DEPLOY_DIR/server.js" "$DEPLOY_DIR/.htaccess" \
+       "$DEPLOY_DIR/package.json" "$DEPLOY_DIR/package-lock.json" \
+       "$DEPLOY_DIR/.htaccess.patched"
 mkdir -p "$DEPLOY_DIR"
 
 echo "→ npm ci"
@@ -24,6 +28,11 @@ npm run build
 echo "→ Копирование артефактов в deploy/"
 # Standalone server (содержит минимальный node_modules).
 cp -R .next/standalone/. "$DEPLOY_DIR/"
+# Next.js standalone кладёт в корень .env-файлы проекта (плейсхолдеры из репо).
+# Это бы затёрло наш deploy/beget.env при сборке. Поэтому удаляем — настоящий
+# production .env загружает deploy.py отдельно (из deploy/server.env → ~/<app>/.env).
+rm -f "$DEPLOY_DIR/.env" "$DEPLOY_DIR/.env.production" "$DEPLOY_DIR/.env.example" \
+      "$DEPLOY_DIR/.env.local" "$DEPLOY_DIR/.env.development"
 # Статика (CSS, JS-чанки, картинки next/image-оптимизации).
 mkdir -p "$DEPLOY_DIR/.next/static"
 cp -R .next/static/. "$DEPLOY_DIR/.next/static/"

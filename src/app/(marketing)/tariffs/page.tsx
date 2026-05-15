@@ -6,9 +6,9 @@ import { TariffTable } from "@/components/marketing/TariffTable";
 import { getAllServices } from "@/lib/repos";
 
 export const metadata: Metadata = {
-  title: "Тарифы Rutega — все цены и пакеты",
+  title: "Тарифы Rutega — корпоративный интернет и сетевые решения",
   description:
-    "Все тарифы Rutega: домашний интернет, ТВ, мобильная связь, бизнес-решения, видеонаблюдение, умный дом. Прозрачные цены без скрытых платежей.",
+    "Тарифы на корпоративный интернет, IP-транзит, VPN, выделенные линии и сетевую безопасность. Прозрачные цены, SLA в договоре.",
   alternates: { canonical: "/tariffs" },
 };
 

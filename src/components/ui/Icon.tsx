@@ -33,6 +33,9 @@ import {
   Shield,
   Lock,
   Radio,
+  Cable,
+  Route,
+  FileCheck,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -72,6 +75,9 @@ const ICONS: Record<string, LucideIcon> = {
   shield: Shield,
   lock: Lock,
   radio: Radio,
+  cable: Cable,
+  route: Route,
+  "file-check": FileCheck,
 };
 
 interface IconProps {

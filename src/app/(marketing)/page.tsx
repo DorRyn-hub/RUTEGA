@@ -28,11 +28,11 @@ export default async function HomePage() {
         <Container>
           <div className="mb-10 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-widest text-[var(--color-brand-600)]">
-              Хиты весны
+              Тарифы
             </p>
-            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Популярные тарифы</h2>
+            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Популярные корпоративные тарифы</h2>
             <p className="mt-3 text-[var(--color-muted)]">
-              Уже выбраны нашими клиентами тысячи раз. Подключение — за 1–3 рабочих дня.
+              Выбраны ведущими компаниями Москвы. Подключение — от 1 рабочего дня.
             </p>
           </div>
           <TariffTable tariffs={tariffs} />

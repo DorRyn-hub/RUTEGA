@@ -49,14 +49,14 @@ export function Footer() {
           <ul className="mt-5 space-y-2 text-sm">
             <li className="flex items-center gap-2">
               <Phone aria-hidden="true" className="h-4 w-4 text-[var(--color-brand-600)]" />
-              <a href={`tel:${company.phoneB2B.replace(/\s/g, "")}`} className="hover:underline">
+              <a href={`tel:${company.phoneB2B.replace(/[\s()-]/g, "")}`} className="hover:underline">
                 {company.phoneB2B}
               </a>
               <span className="text-[var(--color-muted)]">— B2B/B2G</span>
             </li>
             <li className="flex items-center gap-2">
               <Phone aria-hidden="true" className="h-4 w-4 text-[var(--color-brand-600)]" />
-              <a href={`tel:${company.phone.replace(/\s/g, "")}`} className="hover:underline">
+              <a href={`tel:${company.phone.replace(/[\s()-]/g, "")}`} className="hover:underline">
                 {company.phone}
               </a>
               <span className="text-[var(--color-muted)]">— общая линия</span>

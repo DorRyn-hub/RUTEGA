@@ -17,11 +17,11 @@ import type {
 
 const KNOWN_CATEGORIES: ServiceCategory[] = [
   "internet",
-  "tv",
-  "mobile",
-  "business",
+  "transit",
+  "vpn",
+  "dedicated",
+  "wifi",
   "security",
-  "smart-home",
 ];
 
 function asCategory(value: string): ServiceCategory {

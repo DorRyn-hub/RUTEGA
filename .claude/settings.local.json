@@ -11,7 +11,11 @@
       "Bash(curl -s -o /dev/null -w \"Code: %{http_code} Redir: %{redirect_url}\\\\n\" -L --max-redirs 0 http://localhost:3000/)",
       "Bash(xargs kill -9)",
       "Bash(PORT=3000 npm run dev)",
-      "Bash(echo \"started pid=$!\")"
+      "Bash(echo \"started pid=$!\")",
+      "Bash(git -C /Users/dorrynfn/PycharmProjects/Rutega_website status deploy/)",
+      "Bash(chmod 600 /Users/dorrynfn/PycharmProjects/Rutega_website/deploy/beget.env)",
+      "Bash(.venv/bin/python3 deploy/deploy.py --dry-run)",
+      "Bash(.venv/bin/python3 -c ' *)"
     ]
   }
 }

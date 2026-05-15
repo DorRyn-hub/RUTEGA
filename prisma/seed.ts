@@ -62,6 +62,9 @@ async function main() {
         iconKey: s.iconKey,
         features: JSON.stringify(s.features),
         order: s.order,
+        slaUptime: s.slaUptime,
+        slaResponseHours: s.slaResponseHours,
+        slaResolveHours: s.slaResolveHours,
       },
       create: {
         slug: s.slug,
@@ -72,9 +75,9 @@ async function main() {
         iconKey: s.iconKey,
         features: JSON.stringify(s.features),
         order: s.order,
-        slaUptime: 99.7,
-        slaResponseHours: 4,
-        slaResolveHours: 24,
+        slaUptime: s.slaUptime,
+        slaResponseHours: s.slaResponseHours,
+        slaResolveHours: s.slaResolveHours,
       },
     });
   }

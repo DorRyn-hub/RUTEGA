@@ -43,11 +43,11 @@ export function Header() {
         <div className="flex items-center gap-2">
           <A11yToggle className="hidden md:inline-flex" />
           <a
-            href={`tel:${company.phoneB2B.replace(/\s/g, "")}`}
-            className="hidden items-center gap-2 rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-bg)] 2xl:inline-flex"
+            href={`tel:${company.phoneB2B.replace(/[\s()-]/g, "")}`}
+            className="hidden items-center gap-2 rounded-[var(--radius-md)] px-2 py-2 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-bg)] lg:inline-flex"
           >
             <Phone aria-hidden="true" className="h-4 w-4 text-[var(--color-brand-600)]" />
-            {company.phoneB2B}
+            <span className="hidden xl:inline">{company.phoneB2B}</span>
           </a>
           <CallbackModal triggerClassName="hidden md:inline-flex" />
           <HeaderAuthArea navItems={navItems} />

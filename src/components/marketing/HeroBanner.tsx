@@ -7,110 +7,147 @@ import { FadeInUp } from "@/components/motion/FadeInUp";
 import { GradientBlob } from "@/components/motion/GradientBlob";
 import { AnimatedNumber } from "@/components/motion/AnimatedNumber";
 
+const stats = [
+  { label: "Доступность", value: 99.99, suffix: "%", format: (n: number) => n.toFixed(2) },
+  { label: "Клиентов", value: 1200, suffix: "+", format: (n: number) => `${Math.round(n)}` },
+  { label: "Поддержка", value: 24, suffix: "/7", format: (n: number) => `${Math.round(n)}` },
+];
+
 export function HeroBanner() {
   return (
     <section
       className="relative isolate overflow-hidden border-b"
       style={{
         background:
-          "radial-gradient(80% 60% at 80% 0%, rgba(11,95,255,0.18), transparent 60%), radial-gradient(60% 50% at 0% 100%, rgba(11,95,255,0.12), transparent 60%), linear-gradient(180deg, #ffffff, #f7f8fb)",
+          "radial-gradient(80% 60% at 80% 0%, rgba(59,16,123,0.14), transparent 60%), radial-gradient(60% 50% at 0% 100%, rgba(80,90,167,0.10), transparent 60%), linear-gradient(180deg, #ffffff, #f7f8fb)",
       }}
     >
-      <GradientBlob className="-top-40 -left-32" size={520} opacity={0.4} duration={16} />
+      <GradientBlob
+        className="-top-40 -left-32"
+        size={520}
+        opacity={0.35}
+        duration={18}
+        color="var(--color-brand-200)"
+      />
       <GradientBlob
         className="-bottom-40 -right-32"
         size={620}
-        opacity={0.35}
-        duration={20}
-        color="var(--color-brand-200)"
+        opacity={0.28}
+        duration={22}
+        color="var(--color-brand-300)"
       />
+
       <Container className="relative z-10 grid gap-10 py-14 sm:py-20 lg:grid-cols-12 lg:gap-12 lg:py-28">
+        {/* Left column */}
         <div className="lg:col-span-7">
           <FadeInUp delay={0}>
             <Badge tone="brand" className="mb-4">
-              Подключение за 1–3 дня
+              Только для юридических лиц
             </Badge>
           </FadeInUp>
+
           <FadeInUp delay={0.08}>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Гигабитный интернет, ТВ в 4K и мобильная связь — в одном договоре
+            <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-[3.5rem]">
+              Корпоративный интернет
+              <br />и сетевая инфраструктура
+              <br />
+              <span
+                style={{
+                  backgroundImage: "linear-gradient(135deg, #3B107B, #505AA7)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                для вашего бизнеса
+              </span>
             </h1>
           </FadeInUp>
+
           <FadeInUp delay={0.18}>
-            <p className="mt-5 max-w-2xl text-lg text-[var(--color-muted)]">
-              Rutega — оператор с собственной оптической сетью. Подключаем дома, офисы и целые
-              бизнес-центры. Поддержка 24/7 без ботов, SLA 99.95% в договоре.
+            <p className="mt-5 max-w-xl text-lg text-[var(--color-muted)]">
+              Rutega — B2B интернет-провайдер с собственной оптической сетью в Москве. Выделенные
+              каналы, IP-транзит, MPLS VPN и сетевая безопасность. SLA{" "}
+              <span className="font-semibold text-[var(--color-ink)]">99.99%</span> закреплён в
+              договоре.
             </p>
           </FadeInUp>
+
           <FadeInUp delay={0.28}>
             <div className="mt-8 flex flex-wrap gap-3">
-              <LinkButton href="/tariffs" size="lg">
-                Выбрать тариф
+              <LinkButton href="/contacts#order" size="lg">
+                Подать заявку
               </LinkButton>
-              <LinkButton href="#callback" size="lg" variant="secondary">
-                Заказать звонок
+              <LinkButton href="/tariffs" size="lg" variant="secondary">
+                Тарифы и цены
               </LinkButton>
             </div>
           </FadeInUp>
+
           <FadeInUp delay={0.4}>
-            <dl className="mt-10 grid max-w-xl grid-cols-3 gap-6 text-sm">
-              <div>
-                <dt className="text-[var(--color-muted)]">Скорость до</dt>
-                <dd className="text-2xl font-bold text-[var(--color-ink)]">
-                  <AnimatedNumber value={1000} format={(n) => `${Math.round(n)}`} />
-                  <span className="ml-1 text-base font-semibold">Мбит/с</span>
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[var(--color-muted)]">Доступность</dt>
-                <dd className="text-2xl font-bold text-[var(--color-ink)]">
-                  <AnimatedNumber
-                    value={99.95}
-                    format={(n) => n.toFixed(2).replace(/\.0+$/, "")}
-                  />
-                  %
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[var(--color-muted)]">Поддержка</dt>
-                <dd className="text-2xl font-bold text-[var(--color-ink)]">
-                  <AnimatedNumber value={24} />
-                  /<AnimatedNumber value={7} />
-                </dd>
-              </div>
+            <dl className="mt-10 grid max-w-xl grid-cols-1 gap-4 border-t pt-8 text-sm sm:grid-cols-3 sm:gap-6">
+              {stats.map((s) => (
+                <div key={s.label}>
+                  <dt className="text-[var(--color-muted)]">{s.label}</dt>
+                  <dd className="mt-1 text-2xl font-bold text-[var(--color-ink)]">
+                    <AnimatedNumber value={s.value} format={s.format} />
+                    <span className="ml-0.5 text-base font-semibold">{s.suffix}</span>
+                  </dd>
+                </div>
+              ))}
             </dl>
           </FadeInUp>
         </div>
+
+        {/* Right card */}
         <FadeInUp delay={0.2} className="relative flex lg:col-span-5">
           <div
             aria-hidden="true"
-            className="animate-gradient-shift absolute inset-0 -z-10 rounded-[var(--radius-xl)] bg-gradient-to-br from-[var(--color-brand-600)] via-[var(--color-brand-700)] to-[var(--color-brand-800)] opacity-90"
+            className="absolute inset-0 -z-10 rounded-[var(--radius-xl)]"
+            style={{
+              background: "linear-gradient(145deg, #3B107B, #505AA7)",
+            }}
           />
-          <div className="flex w-full flex-col rounded-[var(--radius-xl)] p-8 text-white shadow-xl backdrop-blur">
-            <p className="text-sm uppercase tracking-widest opacity-80">Хит весны</p>
-            <p className="mt-2 text-3xl font-bold">Гига 1000</p>
-            <p className="mt-1 opacity-90">1 Гбит/с + Wi-Fi 6 + антивирус</p>
+          <div className="flex w-full flex-col rounded-[var(--radius-xl)] p-8 text-white shadow-2xl">
+            <p className="text-xs font-semibold uppercase tracking-widest opacity-70">
+              Популярный тариф
+            </p>
+            <p className="mt-2 text-3xl font-black tracking-tight">Business 500</p>
+            <p className="mt-1 text-sm opacity-85">
+              500 Мбит/с симметрично · /29 подсеть · SLA 99.95%
+            </p>
+
             <p className="mt-6 flex items-baseline gap-2">
-              <span className="text-5xl font-bold">
-                <AnimatedNumber value={890} />
+              <span className="text-5xl font-black">
+                <AnimatedNumber value={9900} format={(n) => Math.round(n).toLocaleString("ru-RU")} />
                 {" "}₽
               </span>
-              <span className="opacity-80">/мес</span>
+              <span className="text-sm opacity-75">/мес</span>
             </p>
+
             <ul className="mt-6 space-y-2 text-sm">
-              <li>· Бесплатное подключение</li>
-              <li>· Wi-Fi 6 роутер бесплатно</li>
-              <li>· Белый IP по запросу</li>
-              <li>· Приоритетная поддержка</li>
+              {[
+                "Симметричный выделенный канал",
+                "Подсеть /29 — 6 IP-адресов",
+                "Резервный канал включён",
+                "SLA 99.95% с компенсациями",
+                "NOC 24/7, реакция 1 час",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2 opacity-90">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white opacity-60" />
+                  {item}
+                </li>
+              ))}
             </ul>
+
             <LinkButton
-              href="/services/home-internet"
+              href="/contacts#order"
               size="md"
               variant="secondary"
-              className="mt-auto bg-white"
+              className="mt-auto bg-white text-[var(--color-brand-700)] hover:bg-white/90"
               fullWidth
             >
-              Подробнее
+              Подключить
             </LinkButton>
           </div>
         </FadeInUp>

@@ -14,9 +14,12 @@ export function ServicesPreview({ services }: { services: ServiceDTO[] }) {
           <p className="text-sm font-semibold uppercase tracking-widest text-[var(--color-brand-600)]">
             Услуги
           </p>
-          <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Всё, что нужно для дома и бизнеса</h2>
+          <h2 className="mt-2 text-3xl font-bold sm:text-4xl">
+            Корпоративные сетевые решения
+          </h2>
           <p className="mt-3 text-[var(--color-muted)]">
-            Подключайте отдельные услуги или собирайте конвергентный пакет — экономия до 35%.
+            Выделенные каналы, IP-транзит, VPN и безопасность — всё под единым SLA и в одном
+            договоре для вашей организации.
           </p>
         </ScrollReveal>
         <StaggerContainer className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

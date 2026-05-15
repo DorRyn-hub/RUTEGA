@@ -35,7 +35,7 @@ export default function ContactsPage() {
                   <Phone aria-hidden="true" className="mt-0.5 h-4 w-4 text-[var(--color-brand-600)]" />
                   <div>
                     <a
-                      href={`tel:${company.phone.replace(/\s/g, "")}`}
+                      href={`tel:${company.phone.replace(/[\s()-]/g, "")}`}
                       className="text-base font-semibold"
                     >
                       {company.phone}
@@ -47,7 +47,7 @@ export default function ContactsPage() {
                   <Phone aria-hidden="true" className="mt-0.5 h-4 w-4 text-[var(--color-brand-600)]" />
                   <div>
                     <a
-                      href={`tel:${company.phoneB2B.replace(/\s/g, "")}`}
+                      href={`tel:${company.phoneB2B.replace(/[\s()-]/g, "")}`}
                       className="text-base font-semibold"
                     >
                       {company.phoneB2B}

@@ -1,10 +1,10 @@
 export type ServiceCategory =
   | "internet"
-  | "tv"
-  | "mobile"
-  | "business"
-  | "security"
-  | "smart-home";
+  | "transit"
+  | "vpn"
+  | "dedicated"
+  | "wifi"
+  | "security";
 
 export interface ServiceDTO {
   id: string;

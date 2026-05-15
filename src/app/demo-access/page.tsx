@@ -24,10 +24,7 @@ export default async function DemoAccessPage({ searchParams }: PageProps) {
       />
       <div className="relative w-full max-w-md rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white/90 p-8 shadow-xl backdrop-blur-xl">
         <div className="text-center">
-          <span className="inline-block rounded-full bg-[var(--color-brand-50)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-700)]">
-            DEMO
-          </span>
-          <h1 className="mt-3 text-2xl font-bold text-[var(--color-ink)]">
+          <h1 className="text-2xl font-bold text-[var(--color-ink)]">
             Закрытый предпросмотр Rutega
           </h1>
           <p className="mt-2 text-sm text-[var(--color-muted)]">

@@ -18,7 +18,7 @@ interface ServiceInitial {
   order?: number;
 }
 
-const CATEGORIES = ["internet", "tv", "mobile", "business", "security", "smart-home"];
+const CATEGORIES = ["internet", "transit", "vpn", "dedicated", "wifi", "security"];
 
 export function ServiceForm({ initial }: { initial?: ServiceInitial }) {
   const router = useRouter();

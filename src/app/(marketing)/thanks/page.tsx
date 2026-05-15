@@ -39,7 +39,7 @@ export default function ThanksPage() {
                 Если срочно — позвоните
               </div>
               <a
-                href={`tel:${company.phoneB2B.replace(/\s/g, "")}`}
+                href={`tel:${company.phoneB2B.replace(/[\s()-]/g, "")}`}
                 className="mt-1 block font-display text-xl font-semibold text-[var(--color-brand-700)]"
               >
                 {company.phoneB2B}

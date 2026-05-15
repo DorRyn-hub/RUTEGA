@@ -43,6 +43,17 @@ data/
 
 # python venv (PyCharm artefact)
 .venv/
+__pycache__/
+*.pyc
+
+# deploy credentials and production env (never commit)
+deploy/.env
+deploy/beget.env
+deploy/server.env
+deploy/.htaccess.patched
+
+# local deploy backups
+.backups/
 
 # turbo / cache
 .turbo/

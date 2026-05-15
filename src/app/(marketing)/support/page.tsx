@@ -34,7 +34,7 @@ export default function SupportPage() {
             </div>
             <h2 className="font-semibold">Телефон</h2>
             <a
-              href={`tel:${company.phone.replace(/\s/g, "")}`}
+              href={`tel:${company.phone.replace(/[\s()-]/g, "")}`}
               className="text-lg font-semibold text-[var(--color-brand-700)]"
             >
               {company.phone}
